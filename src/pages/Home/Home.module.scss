@@ -1,0 +1,147 @@
+// Home.module.scss
+.wrapper {
+    min-height: 100vh;
+    background-color: #fff;
+
+    .header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        font-size: 36px;
+        color: #0088AF;
+    }
+
+    .body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 40px;
+
+        .table-container {
+            height: 400px;
+            overflow-y: auto;
+            overflow: hidden;
+            position: relative;
+
+            .table-main {
+                width: 100%;
+                border-collapse: collapse;
+
+                .head-table {
+                    background-color: #0088AF;
+                    color: #fff;
+                    font-weight: bold;
+                    padding: 5px 10px;
+                    th {
+                        width: 20%;
+                        text-align: center;
+                        vertical-align: middle;
+                    }
+
+                    table {
+                        width: 100%;
+                    }
+                }
+
+                .body-table {
+                    overflow-y: auto;
+                    max-height: calc(400px - 40px); /* Trừ chiều cao của header */
+                    table {
+                        width: 100%;
+                    }
+                }
+            }
+            .pagination-wrapper {
+                margin-top: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+        
+                .pagination {
+                    display: flex;
+                    align-items: center;
+                    padding: 2px;
+                    border: 1px solid #ccc;
+                    border-radius: 8px;
+        
+                    .icon {
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 8px;
+                        border-radius: 8px;
+                        transition: all .1s linear;
+        
+                        &:hover {
+                            background-color: #ebe8f1;
+                        }
+        
+                        
+                    }
+        
+                    .curent {
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 0 12px;
+                        margin: 8px 2px;
+                        border-right: 1px solid #ccc;
+                        border-left: 1px solid #ccc;
+                    }
+                }
+            }
+        }
+
+        .first {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+            padding: 40px;
+            font-size: 36px;
+            color: #0088AF;
+
+            .wrap-select {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                .select-option {
+                    width: 160px;
+                    margin: 0 20px;
+                    padding: 10px 15px;
+                }
+
+                .datepicker {
+                    border: 1px solid #ccc;
+                    padding: 10px 15px;
+                    color: #7a7a7a;
+                }
+
+                .button-add {
+                    width: 160px;
+                    height: 40px;
+                    background-color: #0088AF;
+                    color: #fff;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    &:hover {
+                        opacity: 0.7;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
+}

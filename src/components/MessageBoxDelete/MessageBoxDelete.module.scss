@@ -1,0 +1,116 @@
+.wrapper {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.5);
+    top: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+
+    .container-body {
+        width: 30%;
+        height: 34%;
+        background-color: #fff;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+
+        .container-1 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+
+            .title-modal {
+                font-weight: bold;
+                font-size: 20px;
+            }
+
+            .close-modal {
+                width: 40px;
+                text-align: center;
+                font-size: 40px;
+                color: #606060;
+
+                &:hover {
+                    color: #000;
+                    cursor: pointer;
+                }
+            }
+        }
+
+        .container-2 {
+            display: flex;
+            justify-content: center;
+
+            .text-modal{
+                font-size: 16px;
+                color: #272727;
+            }
+        }
+
+        
+        .container-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 50px;
+
+            .button-confirm{
+                background-color: #0088AF;
+                color: #fff;
+                font-size: 16px;
+                font-weight: bold;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                align-self: center;
+                padding: 10px;
+                border-radius: 4px;
+                width: 140px;
+                margin-left: 10px;
+                &:hover {
+                    cursor: pointer;
+                    opacity: 0.8;
+                }
+            }
+
+            .button-cancel{
+                background-color: #f72500;
+                color: #fff;
+                font-size: 16px;
+                font-weight: bold;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                align-self: center;
+                padding: 10px;
+                border-radius: 4px;
+                width: 140px;
+                margin-right: 10px;
+                &:hover {
+                    cursor: pointer;
+                    opacity: 0.8;
+                }
+            }
+        }
+    }
+}
+
+.container-loader {
+    background-color: transparent;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    z-index: 1200;
+    .loader-feedback {
+        margin-top: calc(16% + 30px);
+    }
+}
