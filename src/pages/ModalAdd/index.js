@@ -1,26 +1,24 @@
 import React, { useRef, useState, useEffect } from 'react'
 import classNames from "classnames/bind";
 import styles from './ModalAdd.module.scss'
-import axios from 'axios';
-import baseUrl from '../../utils';
 import HashLoader from "react-spinners/HashLoader";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchDataAddStaff, setIsOpenModalAdd } from '../../redux/slices/staffSlice';
 
 const cx = classNames.bind(styles)
 
-function ModalAdd({ setIsOpenModalAdd, getAllStaff }) {
-
+function ModalAdd({pathWithQuery, queryParamsString}) {
   const fileInputRef = useRef(null);
   const [imageSrc, setImageSrc] = useState({});
   const [nameStaff, setNameStaff] = useState('');
   const [birthdayStaff, setBirthdayStaff] = useState(new Date());
   const [genderStaff, setGenderStaff] = useState('Nam');
   const [defaultDate, setDefaultDate] = useState('');
-  const [loading, setLoading] = useState(false);
   const [textValidationName, setTextValidationName] = useState('');
   const [isOpenTextValidationName, setIsOpenTextValidationName] = useState(false);
   const [textValidationImage, setTextValidationImage] = useState('');
   const [isOpenTextValidationImage, setIsOpenTextValidationImage] = useState(false);
-
+  const dispatch = useDispatch()
   useEffect(() => {
     const today = new Date();
     const formattedDate = formatDate(today);
@@ -72,7 +70,7 @@ function ModalAdd({ setIsOpenModalAdd, getAllStaff }) {
   };
 
   const handleClose = () => {
-    setIsOpenModalAdd(false);
+    dispatch(setIsOpenModalAdd(false));
   }
 
   useEffect(() => {
@@ -107,28 +105,19 @@ function ModalAdd({ setIsOpenModalAdd, getAllStaff }) {
     }
   }
   
-
+  
   const addNewStaff = async () => {
     if (handleValidateImage() == true && handleValidateName() == true) {
-      setLoading(true);
       let staffData = {
         name: nameStaff,
         birthday: birthdayStaff,
         gender: genderStaff,
         avatar: imageSrc.imageBase64,
       }
-      try {
-        console.log(staffData);
-        await axios.post(`${baseUrl}/api/staffs/addNewStaff`, staffData);
-        getAllStaff();
-        setLoading(false);
-        setIsOpenModalAdd(false);
-      } catch (error) {
-        setLoading(false);
-        console.error('Error adding new staff:', error);
-      }
+      dispatch(fetchDataAddStaff([staffData, pathWithQuery, queryParamsString]));
     }
   };
+  const loading = useSelector(state => state.staffManagement.isLoading);
 
   return (
     <>
@@ -189,4 +178,4 @@ function ModalAdd({ setIsOpenModalAdd, getAllStaff }) {
   )
 }
 
-export default ModalAdd
+export default ModalAdd;

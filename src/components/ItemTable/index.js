@@ -2,11 +2,26 @@ import React, { useState } from 'react'
 import classNames from "classnames/bind";
 import styles from './ItemTable.module.scss'
 import convertDate from '../../utils/convertDate';
-import ModalUpdate from '../../pages/ModalUpdate';
+import { useDispatch } from 'react-redux';
+import { setIndexStaffSelected, setIsOpenModalUpdate , setIsOpenModalDelete} from '../../redux/slices/staffSlice';
+
 
 const cx = classNames.bind(styles)
 
-function ItemTable({ staff , handleOnclickUpdate, handleOnclickDelete}) {
+function ItemTable({ staff , index}) {
+
+  const dispatch = useDispatch();
+
+  const handleClickUpdateButton = () => {
+    dispatch(setIndexStaffSelected(index));
+    dispatch(setIsOpenModalUpdate(true));
+  }
+
+  const handleClickDeleteButton = () => {
+    dispatch(setIndexStaffSelected(index));
+    dispatch(setIsOpenModalDelete(true));
+  }
+  
 
   return (
     <tr className={cx('row-table')}>
@@ -18,11 +33,11 @@ function ItemTable({ staff , handleOnclickUpdate, handleOnclickDelete}) {
       <td>{staff.gender}</td>
       <td>
         <div className={cx('wrapper-btn')}>
-          <div className={cx('btn-edit')} onClick={() => handleOnclickUpdate(staff)}>
+          <div className={cx('btn-edit')} onClick={handleClickUpdateButton}>
             Sửa
           </div>
 
-          <div className={cx('btn-delete')} onClick={() => handleOnclickDelete(staff)}>
+          <div className={cx('btn-delete')} onClick={handleClickDeleteButton}>
             Xóa
           </div>
         </div>

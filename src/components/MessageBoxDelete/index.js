@@ -4,27 +4,26 @@ import styles from './MessageBoxDelete.module.scss'
 import axios from 'axios';
 import baseUrl from '../../utils';
 import HashLoader from "react-spinners/HashLoader";
+import { fetchDataDeleteStaff, fetchDataGetAllStaff, setIsOpenModalDelete } from '../../redux/slices/staffSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const cx = classNames.bind(styles)
 
-function MessageBoxDelete({ itemStaff, setIsOpenModalDelete, getAllStaff }) {
-  const [loading, setLoading] = useState(false);
+function MessageBoxDelete({pathWithQuery, queryParamsString}) {
+
+  const dispatch = useDispatch();
+  const indexUpdate = useSelector(state => state.staffManagement.indexUpdate);
+  const staffsList = useSelector(state => state.staffManagement.staffsList);
+  const itemStaff = staffsList[indexUpdate];
+  const loading = useSelector(state => state.staffManagement.isLoading);
 
   const handleClose = () => {
-    setIsOpenModalDelete(false);
+    dispatch(setIsOpenModalDelete(false));
   }
 
   const deleteStaff = async () => {
-    setLoading(true);
-    try {
-      await axios.delete(`${baseUrl}/api/staffs/deleteStaff/${itemStaff._id}`);
-      setIsOpenModalDelete(false);
-      setLoading(false);
-      getAllStaff();
-    } catch (error) {
-      setLoading(false);
-      console.error('Error deleting staff:', error);
-    }
+    
+    dispatch(fetchDataDeleteStaff([itemStaff._id, pathWithQuery, queryParamsString]));
   }
 
   return (

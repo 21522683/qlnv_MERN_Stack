@@ -4,6 +4,8 @@ import styles from './ModalUpdate.module.scss';
 import baseUrl from '../../utils';
 import axios from 'axios';
 import HashLoader from "react-spinners/HashLoader";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchDataUpdateStaff, setIsOpenModalUpdate } from '../../redux/slices/staffSlice';
 
 const cx = classNames.bind(styles);
 const formatDate = (dateString) => {
@@ -20,15 +22,21 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${day}`;
 };
 
-function ModalUpdate({ itemStaff, setIsOpenModalUpdate, getAllStaff }) {
+function ModalUpdate() {
+
+  const indexUpdate = useSelector(state => state.staffManagement.indexUpdate);
+  const staffsList = useSelector(state => state.staffManagement.staffsList);
+  const itemStaff = staffsList[indexUpdate];
+
   const fileInputRef = useRef(null);
   const [imageSrc, setImageSrc] = useState(itemStaff.avatar);
   const [nameStaff, setNameStaff] = useState(itemStaff.name);
   const [birthdayStaff, setBirthdayStaff] = useState(formatDate(itemStaff.birthday));
   const [genderStaff, setGenderStaff] = useState(itemStaff.gender);
-  const [loading, setLoading] = useState(false);
   const [textValidationName, setTextValidationName] = useState('');
   const [isOpenTextValidationName, setIsOpenTextValidationName] = useState(false);
+
+  const dispatch = useDispatch();
 
 
   const handleChooseImage = () => {
@@ -57,7 +65,7 @@ function ModalUpdate({ itemStaff, setIsOpenModalUpdate, getAllStaff }) {
   };
 
   const handleClose = () => {
-    setIsOpenModalUpdate(false);
+    dispatch(setIsOpenModalUpdate(false));
   }
   useEffect(() => {
     let boolCheck = handleValidateName();
@@ -76,26 +84,19 @@ function ModalUpdate({ itemStaff, setIsOpenModalUpdate, getAllStaff }) {
   }
   const updateStaff = async () => {
     if (handleValidateName()) {
-      setLoading(true);
       let staffData = {
+        id: itemStaff._id,
         name: nameStaff,
         birthday: birthdayStaff,
         gender: genderStaff,
         avatar: imageSrc.imageBase64,
       }
-      try {
-        await axios.put(`${baseUrl}/api/staffs/updateStaff/${itemStaff._id}`, staffData);
-        getAllStaff();
-        setLoading(false);
-        setIsOpenModalUpdate(false);
-      } catch (error) {
-        setLoading(false);
-        console.error('Error updating staff:', error);
-      }
+      dispatch(fetchDataUpdateStaff(staffData));
     }
 
   };
 
+  const loading = useSelector(state => state.staffManagement.isLoading);
 
 
   return (

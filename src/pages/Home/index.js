@@ -1,4 +1,3 @@
-// Home.jsx
 import React from 'react';
 import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
@@ -9,23 +8,27 @@ import { FaAngleLeft, FaAngleRight } from 'react-icons/fa6';
 import "react-datepicker/dist/react-datepicker.css";
 import ModalAdd from '../ModalAdd';
 import baseUrl from '../../utils';
-import axios from 'axios';
 import ModalUpdate from '../ModalUpdate';
 import MessageBoxDelete from '../../components/MessageBoxDelete';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchDataGetAllStaff, setIsOpenModalAdd } from '../../redux/slices/staffSlice';
 
 const cx = classNames.bind(styles);
 
 function Home() {
-    const [birthday, setBirthdate] = useState('');
-    const [gender, setGender] = useState("Tất cả");
-    const [staffList, setStaffList] = useState([]);
-    const [isOpenModalAdd, setIsOpenModalAdd] = useState(false);
-    const [isOpenModalUpdate, setIsOpenModalUpdate] = useState(false);
-    const [isOpenModalDelete, setIsOpenModalDelete] = useState(false);
-    const [itemStaff, setItemStaff] = useState({});
-
-    const [totalPages, setTotalPages] = useState(0);
+    const isOpenModalAdd = useSelector(state => state.staffManagement.isOpenModalAdd);
+    const isOpenModalUpdate = useSelector(state => state.staffManagement.isOpenModalUpdate);
+    const isOpenModalDelete = useSelector(state => state.staffManagement.isOpenModalDelete);
+    
+    
     const [pathWithQuery, setPathWithQuery] = useState('');
+
+    const dispatch = useDispatch();
+
+    let staffsList = useSelector(state => state.staffManagement.staffsList);
+    let totalPages = useSelector(state => state.staffManagement.totalPages);
+
+
     const [filter, setFilter] = useState({
         textSearch: '',
         gender: 'Tất cả',
@@ -33,50 +36,50 @@ function Home() {
         page: 1,
     });
 
-    useEffect(() => {
-        handleChangeGenderFilter(gender);
-        handleChangeBirthdayFilter(birthday);
-    }, [gender, birthday]);
 
     useEffect(() => {
-        const queryParams = { page: filter.page, searchString: filter.textSearch.trim(), gender: filter.gender, birthday: filter.birthday !== null ? filter.birthday : '' };
+        const queryParams = { page: filter.page, searchString: filter.textSearch.trim(), gender: filter.gender, birthday: filter.birthday };
         const queryString = new URLSearchParams(queryParams).toString();
         const pathWithQuery = `${baseUrl}/api/staffs/getAllStaff?${queryString}`;
         setPathWithQuery(pathWithQuery);
     }, [filter]);
-    
-    
+
+
     useEffect(() => {
         if (pathWithQuery) {
             getAllStaff();
         }
     }, [pathWithQuery]);
 
-    useEffect(() => {
-        setStaffList(staffList);
-    }, [staffList]);
-
+    const [queryParamsString, setQueryParamsString] = useState({});
     const getAllStaff = async () => {
-        try {
-            const queryParams = {
-                searchString: filter.textSearch,
-                gender: filter.gender,
-                birthday: filter.birthday,
-                page: filter.page,
-            };
-            const response = await axios.get(pathWithQuery, queryParams);
-            console.log(response);
-            setStaffList(response.data.staffs);
-            setTotalPages(response.data.totalPages);
-        } catch (error) {
-            console.error('Error fetching staffs:', error);
-        }
+        const queryParams = {
+            searchString: filter.textSearch,
+            gender: filter.gender,
+            birthday: filter.birthday,
+            page: filter.page,
+        };
+        setQueryParamsString(prve => {
+            return {
+               ...prve,
+               ...queryParams
+            }
+        });
+
+        dispatch(fetchDataGetAllStaff([pathWithQuery, queryParams]));
     };
 
+    useEffect(() => {
+        const currentDate = new Date();
+        const formattedDate = currentDate.toISOString().split('T')[0];
+        setFilter(prev => {
+            return { ...prev, birthday: formattedDate };
+        })
+    }, []);
+
     const formatDate = (date) => {
-        // Kiểm tra nếu date là một đối tượng Date, không cần chuyển đổi
         if (!(date instanceof Date)) {
-            date = new Date(date); // Chuyển đổi giá trị ngày thành đối tượng Date
+            date = new Date(date);
         }
         const year = date.getFullYear();
         let month = date.getMonth() + 1;
@@ -89,51 +92,56 @@ function Home() {
         }
         return `${year}-${month}-${day}`;
     };
-    
+
+    const handleClickAddButton = () => {
+        dispatch(setIsOpenModalAdd(true));
+    }
+
+    const handleChangeGenderFilter = (value) => {
+        console.log("fillter:  ", filter);
+        setFilter(prev => ({ ...prev, gender: value }));
+    };
     
     const handleChangeBirthdayFilter = (value) => {
-        const selectedDate = new Date(value);
-        const formattedDate = formatDate(selectedDate);
-        setFilter((prev) => ({ ...prev, birthday: formattedDate }));
+        console.log(value);
+        if (value === '') {
+            const currentDate = new Date();
+            const formattedDate = currentDate.toISOString().split('T')[0];
+            setFilter(prev => ({ ...prev, birthday: formattedDate }));
+        }
+        else {
+            const selectedDate = new Date(value);
+            if (!isNaN(selectedDate.getTime())) {
+                const formattedDate = formatDate(selectedDate);
+                setFilter(prev => ({ ...prev, birthday: formattedDate }));
+            }
+        }
     };
+    
     const handleChangeInputSearch = (value) => {
         setFilter((prev) => ({ ...prev, textSearch: value }));
     };
 
-    const handleChangeGenderFilter = (value) => {
-        setFilter((prev) => ({ ...prev, gender: value }));
-    };
-
     const handleClickPreviousPage = () => {
         if (filter.page === 1) return;
-        setFilter((prev) => ({ ...prev, page: prev.page - 1 }));
+        setFilter(prev => ({ ...prev, page: prev.page - 1 }));
     };
     const handleClickNextPage = () => {
         if (filter.page === totalPages) return;
-        setFilter((prev) => ({ ...prev, page: prev.page + 1 }));
+        setFilter(prev => ({ ...prev, page: prev.page + 1 }));
+        console.log(filter.page);
     };
-
-    const handleOnclickUpdate = (staff) => {
-        setIsOpenModalUpdate(true);
-        setItemStaff(staff);
-    }
-
-    const handleOnclickDelete = (staff) => {
-        setIsOpenModalDelete(true);
-        setItemStaff(staff);
-    }
-
 
     return (
         <div className={cx('wrapper')}>
             {
-                isOpenModalAdd && <ModalAdd setIsOpenModalAdd={setIsOpenModalAdd} getAllStaff={getAllStaff} />
+                isOpenModalAdd && <ModalAdd pathWithQuery={pathWithQuery} queryParamsString={queryParamsString}/>
             }
             {
-                isOpenModalUpdate && <ModalUpdate itemStaff={itemStaff} setIsOpenModalUpdate={setIsOpenModalUpdate} getAllStaff={getAllStaff} />
+                isOpenModalUpdate && <ModalUpdate/>
             }
             {
-                isOpenModalDelete && <MessageBoxDelete itemStaff={itemStaff} setIsOpenModalDelete={setIsOpenModalDelete} getAllStaff={getAllStaff} />
+                isOpenModalDelete && <MessageBoxDelete pathWithQuery={pathWithQuery} queryParamsString={queryParamsString}/>
             }
             <div className={cx('header')}>
                 Quản lý nhân viên
@@ -145,18 +153,18 @@ function Home() {
                         <input
                             type='date'
                             className={cx('datepicker')}
-                            value={birthday}
-                            onChange={(event) => setBirthdate(event.target.value)}
+                            value={filter.birthday}
+                            onChange={(event) => handleChangeBirthdayFilter(event.target.value)}
                         />
                         <select
                             className={cx('select-option')}
-                            value={gender}
-                            onChange={(event) => setGender(event.target.value)} >
+                            value={filter.gender}
+                            onChange={(event) => handleChangeGenderFilter(event.target.value)} >
                             <option value="Tất cả">Tất cả</option>
                             <option value="Nam">Nam</option>
                             <option value="Nữ">Nữ</option>
                         </select>
-                        <div className={cx('button-add')} onClick={() => setIsOpenModalAdd(true)}>
+                        <div className={cx('button-add')} onClick={handleClickAddButton}>
                             Thêm nhân viên
                         </div>
                     </div>
@@ -181,9 +189,9 @@ function Home() {
                             <table>
                                 <tbody>
                                     {
-                                        staffList?.map((staff, index) => {
+                                        staffsList.map((staff, index) => {
                                             return (
-                                                <ItemTable key={index} staff={staff} handleOnclickUpdate={handleOnclickUpdate} handleOnclickDelete={handleOnclickDelete} />
+                                                <ItemTable key={index} staff={staff} index={index} />
                                             )
                                         })
                                     }
